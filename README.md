@@ -1,4 +1,4 @@
-<a href="https://www.npmjs.com/package/react-native-styled-markup" target="_blank">
+<a href="https://www.npmjs.com/package/react-native-styled-markup">
   <img alt="npm" src="https://img.shields.io/npm/v/react-native-styled-markup">
 </a>
 
