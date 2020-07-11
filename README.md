@@ -1,3 +1,5 @@
+![npm](https://img.shields.io/npm/v/react-native-styled-markup)
+
 # react-native-styled-markup
 Markup text with formatting capability for react native.
 
