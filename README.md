@@ -5,6 +5,8 @@
 # react-native-styled-markup
 Markup text with formatting capability for react native.
 
+## Usage
+
 Check it out on [expo.io](https://snack.expo.io/@dbilgin/markuptext)
 
 ```
@@ -29,6 +31,11 @@ import MarkupText from 'react-native-styled-markup';
   sit[br]amet,[br]consectetur
 </MarkupText>
 ```
+
+![MarkupText](https://github.com/dbilgin/images/blob/master/MarkupText.png "MarkupText")
+
+## Properties
+
 
 | Property  | Type                   | Default | Description                                  |
 |-----------|------------------------|---------|----------------------------------------------|
