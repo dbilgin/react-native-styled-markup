@@ -1,0 +1,59 @@
+{
+  "name": "react-native-styled-markup",
+  "title": "StyledMarkup",
+  "version": "0.9.0",
+  "description": "Markup text with formatting capability for react native.",
+  "main": "dist/MarkupText.js",
+  "types": "dist/MarkupText.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbilgin/react-native-styled-markup.git",
+    "baseUrl": "https://github.com/dbilgin/react-native-styled-markup"
+  },
+  "private": false,
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "react-native",
+    "markup"
+  ],
+  "author": {
+    "name": "dbilgin"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -d",
+    "prepublishOnly": "npm run build",
+    "format": "prettier --config .prettierrc.js --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint": "eslint \"src/**/*.tsx\" --cache",
+    "type-check": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "licenseFilename": "LICENSE",
+  "readmeFilename": "README.md",
+  "peerDependencies": {
+    "react": "^16.8.6",
+    "react-native": ">=0.60.0 <1.0.x"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/runtime": "7.9.2",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "@types/react": "^16.9.11",
+    "@types/react-native": "^0.60.22",
+    "@types/react-navigation": "^3.0.8",
+    "@types/react-test-renderer": "^16.9.2",
+    "babel-jest": "^25.3.0",
+    "eslint": "5.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "metro-react-native-babel-preset": "^0.56.0",
+    "prettier": "^1.18.2",
+    "react": "16.11.0",
+    "react-native": "^0.62.2",
+    "react-navigation": "^4.0.10",
+    "react-test-renderer": "16.11.0",
+    "rimraf": "^3.0.0",
+    "typescript": "^3.6.4"
+  }
+}
