@@ -35,7 +35,7 @@ import MarkupText from 'react-native-styled-markup';
 </MarkupText>
 ```
 
-![MarkupText](https://github.com/dbilgin/images/blob/master/MarkupText.png "MarkupText")
+![MarkupText](https://github.com/dbilgin/images/blob/master/MarkupTextSS.png "MarkupText")
 
 ## Properties
 
