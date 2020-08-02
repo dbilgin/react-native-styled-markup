@@ -21,13 +21,16 @@ import MarkupText from 'react-native-styled-markup';
     textDecorationLine: 'underline',
     color: 'darkblue',
     fontWeight: 'bold',
-  }}>
+  }}
+  imageSources={[require('./150.png')]}>
   [b]Lorem ipsum dolor[/b] sit amet, consectetur
   [color=#FA5544]adipiscing elit, sed do eiusmod[/color] tempor
   incididunt ut [u]labore et dolore magna[/u] aliqua. Ut enim ad
-  [s]minim veniam, quis[/s] nostrud exercitation ullamco laboris nisi ut
-  aliquip ex ea commodo consequat. And here is a [link]link[/link]! And
-  another [link]link[/link]!
+  [s]minim veniam, quis[/s] nostrud exercitation
+  [image=https://via.placeholder.com/150 width=50 height=20
+  resizeMode=contain/] ullamco laboris nisi ut [linkedImage width=50
+  height=20 resizeMode=contain/] aliquip ex ea commodo consequat. And
+  here is a [link]link[/link]! And another [link]link[/link]!
   sit[br]amet,[br]consectetur
 </MarkupText>
 ```
@@ -50,3 +53,4 @@ import MarkupText from 'react-native-styled-markup';
 | style | ViewStyle \| undefined | - | Container View style |
 | regularColor | string \| undefined | black | Default color for the text |
 | linkEvents | [() => void] \| undefined | - | When [link] is used in a text, events can be attached to these partial texts with linkEvents through their indices. |
+| imageSources | ImageSourcePropType[] \| undefined | - | When [linkedImage] is used in a text, local images can be attached to these partial texts with imageSources through their indices. |
