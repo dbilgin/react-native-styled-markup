@@ -1,7 +1,7 @@
 {
   "name": "react-native-styled-markup",
-  "title": "StyledMarkup",
-  "version": "0.9.1",
+  "title": "MarkupText",
+  "version": "0.9.2",
   "description": "Markup text with formatting capability for react native.",
   "main": "dist/MarkupText.js",
   "types": "dist/MarkupText.d.ts",
@@ -16,7 +16,10 @@
   ],
   "keywords": [
     "react-native",
-    "markup"
+    "markup",
+    "style",
+    "format",
+    "text"
   ],
   "author": {
     "name": "dbilgin"
@@ -42,8 +45,6 @@
     "@react-native-community/eslint-config": "^0.0.5",
     "@types/react": "^16.9.11",
     "@types/react-native": "^0.60.22",
-    "@types/react-navigation": "^3.0.8",
-    "@types/react-test-renderer": "^16.9.2",
     "babel-jest": "^25.3.0",
     "eslint": "5.0.0",
     "eslint-plugin-prettier": "^3.1.1",
@@ -51,8 +52,6 @@
     "prettier": "^1.18.2",
     "react": "16.11.0",
     "react-native": "^0.62.2",
-    "react-navigation": "^4.0.10",
-    "react-test-renderer": "16.11.0",
     "rimraf": "^3.0.0",
     "typescript": "^3.6.4"
   }

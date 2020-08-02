@@ -1,5 +1,13 @@
 import React, {Component} from 'react';
-import {View, ViewStyle, Text, StyleSheet, TextStyle} from 'react-native';
+import {
+  View,
+  ViewStyle,
+  Text,
+  StyleSheet,
+  TextStyle,
+  Image,
+  ImageSourcePropType,
+} from 'react-native';
 
 interface IProps {
   textStyle?: TextStyle;
@@ -13,6 +21,7 @@ interface IProps {
   style?: ViewStyle;
   regularColor?: string;
   linkEvents?: [() => void];
+  imageSources?: ImageSourcePropType[];
 }
 
 interface IState {}
@@ -22,14 +31,27 @@ enum FormatType {
   ITALIC,
   UNDERLINE,
   STRIKETHROUGH,
+  LINK,
   NEW_LINE,
+  IMAGE,
+  LINKED_IMAGE,
 }
 
 interface Structured {
   pressEvent?: () => void;
+  imageSource?: ImageSourcePropType;
   formatting?: FormatType;
   color?: string;
   value: string;
+  width?: number;
+  height?: number;
+  resizeMode?:
+    | 'cover'
+    | 'contain'
+    | 'stretch'
+    | 'repeat'
+    | 'center'
+    | undefined;
 }
 
 export default class MarkupText extends Component<IProps, IState> {
@@ -39,6 +61,7 @@ export default class MarkupText extends Component<IProps, IState> {
     regExp: RegExp,
     formatType?: FormatType,
     pressEvent?: [() => void | undefined],
+    imageSource?: ImageSourcePropType[],
   ) {
     let eventIndex = 0;
     let extraIndex = 0;
@@ -51,21 +74,27 @@ export default class MarkupText extends Component<IProps, IState> {
         if (regExpMatch) {
           if (regExpMatch.index !== undefined) {
             partedText.push({
-              color: undefined,
               value: regExpMatch.input
                 ? regExpMatch.input.substring(regExpMatch.index, -1)
                 : '',
             });
           }
-          partedText.push({
+
+          let newStructured: Structured = {
             formatting: formatType,
-            pressEvent:
-              !!pressEvent && pressEvent.length > eventIndex
-                ? pressEvent[eventIndex]
-                : undefined,
-            color: undefined,
             value: regExpMatch[1],
-          });
+          };
+
+          this.setCustomProperties(
+            newStructured,
+            regExpMatch,
+            eventIndex,
+            formatType,
+            pressEvent,
+            imageSource,
+          );
+
+          partedText.push(newStructured);
           eventIndex++;
 
           colorText = colorText.substring(
@@ -81,6 +110,51 @@ export default class MarkupText extends Component<IProps, IState> {
       structuredText.splice(index + extraIndex, 1, ...partedText);
       extraIndex += partedText.length - 1;
     });
+  }
+
+  setCustomProperties(
+    newStructured: Structured,
+    regExpMatch: RegExpMatchArray,
+    eventIndex: number,
+    formatType?: FormatType,
+    pressEvent?: [() => void | undefined],
+    imageSource?: ImageSourcePropType[],
+  ) {
+    if (formatType === FormatType.IMAGE) {
+      newStructured.width = Number(regExpMatch[2]);
+      newStructured.height = Number(regExpMatch[3]);
+      newStructured.resizeMode =
+        regExpMatch[4] === 'undefined'
+          ? undefined
+          : (regExpMatch[4] as
+              | 'cover'
+              | 'contain'
+              | 'stretch'
+              | 'repeat'
+              | 'center');
+    } else if (formatType === FormatType.LINKED_IMAGE) {
+      newStructured.width = Number(regExpMatch[1]);
+      newStructured.height = Number(regExpMatch[2]);
+      newStructured.resizeMode =
+        regExpMatch[3] === 'undefined'
+          ? undefined
+          : (regExpMatch[3] as
+              | 'cover'
+              | 'contain'
+              | 'stretch'
+              | 'repeat'
+              | 'center');
+
+      newStructured.imageSource =
+        !!imageSource && imageSource.length > eventIndex
+          ? imageSource[eventIndex]
+          : undefined;
+    } else if (formatType === FormatType.LINK) {
+      newStructured.pressEvent =
+        !!pressEvent && pressEvent.length > eventIndex
+          ? pressEvent[eventIndex]
+          : undefined;
+    }
   }
 
   loopForRegExp(text: string, array: Structured[], regExp: RegExp) {
@@ -107,26 +181,6 @@ export default class MarkupText extends Component<IProps, IState> {
     }
   }
 
-  /**
-   * Can be used in the future for getting data like color from new properties.
-   */
-
-  // getFormattedWithData(
-  //   loopText: Structured[],
-  //   structuredText: Structured[],
-  //   regExp: RegExp,
-  // ) {
-  //   let extraIndex = 0;
-  //   loopText.forEach((text, index) => {
-  //     let partedText: Structured[] = [];
-
-  //     this.loopForRegExp(text.value, partedText, regExp);
-
-  //     structuredText.splice(index + extraIndex, 1, ...partedText);
-  //     extraIndex += partedText.length - 1;
-  //   });
-  // }
-
   getStructuredColor(colorText: string) {
     let structuredText: {
       color?: string;
@@ -138,13 +192,13 @@ export default class MarkupText extends Component<IProps, IState> {
   }
 
   getStructuredBold(structuredText: Structured[]) {
-    const loopText = structuredText.concat([]);
+    const loopText = [...structuredText];
     const boldRegExp = new RegExp('\\[b](.*?)\\[\\/b]');
     this.getFormatted(loopText, structuredText, boldRegExp, FormatType.BOLD);
   }
 
   getStructuredItalic(structuredText: Structured[]) {
-    const loopText = structuredText.concat([]);
+    const loopText = [...structuredText];
     const italicRegExp = new RegExp('\\[i](.*?)\\[\\/i]');
     this.getFormatted(
       loopText,
@@ -155,7 +209,7 @@ export default class MarkupText extends Component<IProps, IState> {
   }
 
   getStructuredUnderline(structuredText: Structured[]) {
-    const loopText = structuredText.concat([]);
+    const loopText = [...structuredText];
     const underlineRegExp = new RegExp('\\[u](.*?)\\[\\/u]');
     this.getFormatted(
       loopText,
@@ -166,7 +220,7 @@ export default class MarkupText extends Component<IProps, IState> {
   }
 
   getStructuredStrikethrough(structuredText: Structured[]) {
-    const loopText = structuredText.concat([]);
+    const loopText = [...structuredText];
     const underlineRegExp = new RegExp('\\[s](.*?)\\[\\/s]');
     this.getFormatted(
       loopText,
@@ -177,26 +231,53 @@ export default class MarkupText extends Component<IProps, IState> {
   }
 
   getStructuredLink(structuredText: Structured[]) {
-    const loopText = structuredText.concat([]);
+    const loopText = [...structuredText];
     const colorRegExp = new RegExp('\\[link](.*?)\\[\\/link]');
     this.getFormatted(
       loopText,
       structuredText,
       colorRegExp,
-      undefined,
+      FormatType.LINK,
       this.props.linkEvents,
     );
-    return structuredText;
   }
 
   getStructuredNewLine(structuredText: Structured[]) {
-    const loopText = structuredText.concat([]);
+    const loopText = [...structuredText];
     const newLineRegExp = new RegExp('\\[br](.*?)');
     this.getFormatted(
       loopText,
       structuredText,
       newLineRegExp,
       FormatType.NEW_LINE,
+    );
+  }
+
+  getStructuredImage(structuredText: Structured[]) {
+    const loopText = [...structuredText];
+    const newLineRegExp = new RegExp(
+      '\\[image=(.*?) width=(.*?) height=(.*?) resizeMode=(.*?)\\/]',
+    );
+    this.getFormatted(
+      loopText,
+      structuredText,
+      newLineRegExp,
+      FormatType.IMAGE,
+    );
+  }
+
+  getStructuredLinkedImage(structuredText: Structured[]) {
+    const loopText = [...structuredText];
+    const newLineRegExp = new RegExp(
+      '\\[linkedImage width=(.*?) height=(.*?) resizeMode=(.*?)\\/]',
+    );
+    this.getFormatted(
+      loopText,
+      structuredText,
+      newLineRegExp,
+      FormatType.LINKED_IMAGE,
+      undefined,
+      this.props.imageSources,
     );
   }
 
@@ -210,56 +291,80 @@ export default class MarkupText extends Component<IProps, IState> {
     this.getStructuredStrikethrough(structuredText);
     this.getStructuredLink(structuredText);
     this.getStructuredNewLine(structuredText);
+    this.getStructuredImage(structuredText);
+    this.getStructuredLinkedImage(structuredText);
 
     return (
       <View style={this.props.style}>
         <Text style={this.props.textStyle}>
           {!!structuredText.length &&
-            structuredText.map((data, index) => (
-              <Text key={'colored' + index}>
-                <Text
-                  onPress={data.pressEvent}
-                  style={[
-                    {
-                      color: !data.color
-                        ? this.props.regularColor || 'black'
-                        : data.color,
-                      fontWeight:
-                        data.formatting === FormatType.BOLD ? 'bold' : 'normal',
-                      fontStyle:
-                        data.formatting === FormatType.ITALIC
-                          ? 'italic'
-                          : 'normal',
-                      textDecorationLine:
-                        data.formatting === FormatType.UNDERLINE
-                          ? 'underline'
-                          : data.formatting === FormatType.STRIKETHROUGH
-                          ? 'line-through'
-                          : 'none',
-                    },
-                    styles.regularText,
-                    !data.color
-                      ? this.props.regularTextStyle
-                      : this.props.coloredTextStyle,
-                    data.formatting === FormatType.BOLD
-                      ? this.props.boldTextStyle
-                      : undefined,
-                    data.formatting === FormatType.ITALIC
-                      ? this.props.italicTextStyle
-                      : undefined,
-                    data.formatting === FormatType.UNDERLINE
-                      ? this.props.underlineTextStyle
-                      : undefined,
-                    data.formatting === FormatType.STRIKETHROUGH
-                      ? this.props.strikethroughTextStyle
-                      : undefined,
-                    data.pressEvent ? this.props.linkTextStyle : undefined,
-                  ]}>
-                  {data.value}
+            structuredText.map((data, index) =>
+              data.formatting === FormatType.IMAGE ||
+              data.formatting === FormatType.LINKED_IMAGE ? (
+                <Image
+                  key={'colored' + index}
+                  source={
+                    data.formatting === FormatType.LINKED_IMAGE
+                      ? data.imageSource!
+                      : {uri: data.value}
+                  }
+                  style={{
+                    width: data.width,
+                    height: data.height,
+                    resizeMode: data.resizeMode,
+                  }}
+                />
+              ) : (
+                <Text key={'colored' + index}>
+                  <Text
+                    onPress={data.pressEvent}
+                    style={[
+                      // eslint-disable-next-line react-native/no-inline-styles
+                      {
+                        color: !data.color
+                          ? this.props.regularColor || 'black'
+                          : data.color,
+                        fontWeight:
+                          data.formatting === FormatType.BOLD
+                            ? 'bold'
+                            : 'normal',
+                        fontStyle:
+                          data.formatting === FormatType.ITALIC
+                            ? 'italic'
+                            : 'normal',
+                        textDecorationLine:
+                          data.formatting === FormatType.UNDERLINE
+                            ? 'underline'
+                            : data.formatting === FormatType.STRIKETHROUGH
+                            ? 'line-through'
+                            : 'none',
+                      },
+                      styles.regularText,
+                      !data.color
+                        ? this.props.regularTextStyle
+                        : this.props.coloredTextStyle,
+                      data.formatting === FormatType.BOLD
+                        ? this.props.boldTextStyle
+                        : undefined,
+                      data.formatting === FormatType.ITALIC
+                        ? this.props.italicTextStyle
+                        : undefined,
+                      data.formatting === FormatType.UNDERLINE
+                        ? this.props.underlineTextStyle
+                        : undefined,
+                      data.formatting === FormatType.STRIKETHROUGH
+                        ? this.props.strikethroughTextStyle
+                        : undefined,
+                      data.pressEvent ? this.props.linkTextStyle : undefined,
+                    ]}>
+                    {data.value}
+                  </Text>
+                  {data.formatting === FormatType.NEW_LINE && (
+                    <Text>{'\n'}</Text>
+                  )}
                 </Text>
-                {data.formatting === FormatType.NEW_LINE && <Text>{'\n'}</Text>}
-              </Text>
-            ))}
+              ),
+            )}
         </Text>
       </View>
     );
